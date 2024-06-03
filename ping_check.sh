@@ -9,6 +9,9 @@ IP_ADDRESS="INSERT_YOUR_IP_ADDRESS"
 # Define the trunk name
 TRUNK_NAME="800"
 
+# Get the trunk number
+TRUNK_NUMBER=$(fwconsole trunks --list | grep "$TRUNK_NAME" | awk -F '|' '{gsub(/^ +| +$/, "", $2); print $2}')
+
 # Get the current timestamp
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
@@ -42,10 +45,10 @@ if [ $? -eq 0 ]; then
     echo "$TIMESTAMP - OK" >> $LOG_FILE
     
     # Only disable the trunk if it is currently enabled
-    if [ "$TRUNK_STATUS" == "off" ]; then
+    if [ "$TRUNK_STATUS" == "on" ]; then
         echo "$TIMESTAMP - Trunk $TRUNK_NAME is currently enabled. Disabling it." >> $LOG_FILE
-        TRUNK_DISABLE_OUTPUT=$(/usr/sbin/fwconsole trunk --disable "$TRUNK_NAME" 2>&1)
-        echo "$TIMESTAMP - /usr/sbin/fwconsole trunk --disable $TRUNK_NAME output:" >> $LOG_FILE
+        TRUNK_DISABLE_OUTPUT=$(/usr/sbin/fwconsole trunk --disable "$TRUNK_NUMBER" 2>&1)
+        echo "$TIMESTAMP - /usr/sbin/fwconsole trunk --disable $TRUNK_NUMBER output:" >> $LOG_FILE
         echo "$TRUNK_DISABLE_OUTPUT" >> $LOG_FILE
         # Run the command to reload the configuration
         RELOAD_OUTPUT=$(/usr/sbin/fwconsole reload 2>&1)
@@ -60,10 +63,10 @@ else
     echo "$PING_RESULT" >> $LOG_FILE
     
     # Only enable the trunk if it is currently disabled
-    if [ "$TRUNK_STATUS" == "on" ]; then
+    if [ "$TRUNK_STATUS" == "off" ]; then
         echo "$TIMESTAMP - Trunk $TRUNK_NAME is currently disabled. Enabling it." >> $LOG_FILE
-        TRUNK_ENABLE_OUTPUT=$(/usr/sbin/fwconsole trunk --enable "$TRUNK_NAME" 2>&1)
-        echo "$TIMESTAMP - /usr/sbin/fwconsole trunk --enable $TRUNK_NAME output:" >> $LOG_FILE
+        TRUNK_ENABLE_OUTPUT=$(/usr/sbin/fwconsole trunk --enable "$TRUNK_NUMBER" 2>&1)
+        echo "$TIMESTAMP - /usr/sbin/fwconsole trunk --enable $TRUNK_NUMBER output:" >> $LOG_FILE
         echo "$TRUNK_ENABLE_OUTPUT" >> $LOG_FILE
 
         # Run the command to reload the configuration
