@@ -1,4 +1,6 @@
 #!/bin/bash
+# Set PATH explicitly (adjust as needed)
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # Define the log file
 LOG_FILE="/var/log/availability_test.log"
